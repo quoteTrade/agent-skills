@@ -1,0 +1,1887 @@
+{
+  "author": "Quote.Trade",
+  "authorUrl": "https://quote.trade",
+  "cloudEndpoint": "https://quote.trade/mcp",
+  "description": "Official hosted MCP for Quote.Trade: market data, account/positions/risk, orders and cancels, deposits, and stablecoin withdrawals to the user's own wallet.",
+  "homepage": "https://quote.trade/for-agents/",
+  "icon": "https://quote.trade/favicon.ico",
+  "identifier": "quotetrade-quote-trade-mcp",
+  "name": "Quote.Trade MCP Adapter",
+  "prompts": [],
+  "resources": [],
+  "tags": [
+    "crypto",
+    "trading",
+    "dex",
+    "market-data",
+    "stablecoin"
+  ],
+  "tools": [
+    {
+      "name": "quote_trade_api_discovery",
+      "title": "Quote.Trade direct API discovery",
+      "description": "Read once to learn efficient direct REST/WebSocket use: routes, signing, streaming, cumulative depth, and client execution controls. Public guidance only; no upstream calls.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "schemaVersion": {
+            "type": "string",
+            "description": "Discovery document schema version."
+          },
+          "serverVersion": {
+            "type": "string",
+            "description": "MCP implementation version."
+          },
+          "releaseDate": {
+            "type": "string",
+            "description": "MCP implementation release date (YYYY-MM-DD)."
+          },
+          "purpose": {
+            "type": "string",
+            "description": "How to use the guide."
+          },
+          "discoveryUrl": {
+            "type": "string",
+            "description": "Public HTTP discovery URL."
+          },
+          "bases": {
+            "type": "object",
+            "description": "Configured REST, WebSocket, and MCP URLs."
+          },
+          "documentation": {
+            "type": "object",
+            "description": "Canonical documentation links."
+          },
+          "rest": {
+            "type": "object",
+            "description": "Routes and route-specific signing guidance."
+          },
+          "webSocket": {
+            "type": "object",
+            "description": "Subscriptions and reconnection guidance."
+          },
+          "depthSemantics": {
+            "type": "object",
+            "description": "Cumulative quantity and quote freshness."
+          },
+          "workflow": {
+            "type": "array",
+            "description": "Efficient agent integration workflow.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "executionControls": {
+            "type": "array",
+            "description": "Controls required in direct API clients.",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "schemaVersion",
+          "serverVersion",
+          "releaseDate",
+          "purpose",
+          "discoveryUrl",
+          "bases",
+          "documentation",
+          "workflow",
+          "rest",
+          "webSocket",
+          "depthSemantics",
+          "executionControls"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "quote_trade_api_manifest",
+      "title": "Quote.Trade API/MCP manifest",
+      "description": "Explains that MCP is only a tool/schema adapter around the existing Quote.Trade APIs, and returns local servlet guardrail configuration.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "adapter": {
+            "type": "string",
+            "description": "MCP adapter name."
+          },
+          "version": {
+            "type": "string",
+            "description": "Adapter version."
+          },
+          "releaseDate": {
+            "type": "string",
+            "description": "Adapter release date (YYYY-MM-DD)."
+          },
+          "servletOnly": {
+            "type": "boolean",
+            "description": "True when this adapter is servlet-hosted only."
+          },
+          "mcpProtocolVersion": {
+            "type": "string",
+            "description": "MCP protocol version."
+          },
+          "mcpEndpointPath": {
+            "type": "string",
+            "description": "Local MCP path."
+          },
+          "mcpPublicUrl": {
+            "type": "string",
+            "description": "Public MCP URL."
+          },
+          "directApiDiscoveryUrl": {
+            "type": "string",
+            "description": "Public GET guide for efficient direct REST/WebSocket use."
+          },
+          "apiBase": {
+            "type": "string",
+            "description": "Quote.Trade REST API base."
+          },
+          "liquidityApiBase": {
+            "type": "string",
+            "description": "Configured and validated at startup, but no MCP tool currently routes a request through it - every tool (withdraw included) calls apiBase. Reported here for operator visibility only."
+          },
+          "wsBase": {
+            "type": "string",
+            "description": "Quote.Trade WebSocket base."
+          },
+          "canonicalBehavior": {
+            "type": "string",
+            "description": "Adapter behavior summary."
+          },
+          "ordersExposedThroughMcp": {
+            "type": "boolean",
+            "description": "True when order tools are registered in tools/list."
+          },
+          "withdrawalsExposedThroughMcp": {
+            "type": "boolean",
+            "description": "True when withdraw tools are registered in tools/list."
+          },
+          "depositsExposedThroughMcp": {
+            "type": "boolean",
+            "description": "True when deposit-address tools are registered in tools/list."
+          },
+          "liveTradingExecutable": {
+            "type": "boolean",
+            "description": "Server configuration permits orders: trading enabled and a nonempty symbol allowlist. No MCP USD cap; caller credentials and backend account checks are still required."
+          },
+          "liveWithdrawExecutable": {
+            "type": "boolean",
+            "description": "Server configuration permits a supported withdrawal asset: trading enabled and USDC/USDT/XUSDC allowed. No MCP USD cap; caller withdrawal entitlement and backend balance checks are still required."
+          },
+          "withdrawDestination": {
+            "type": "string",
+            "description": "Always own-wallet-login-only; no toAddress is ever accepted."
+          },
+          "tradingEnabled": {
+            "type": "boolean",
+            "description": "Server-side live trading/withdraw enablement."
+          },
+          "allowedSymbolsMode": {
+            "type": "string",
+            "description": "deny-all | all-quote-trade-instruments (*) | allowlist."
+          },
+          "maxNotionalUsd": {
+            "type": "null",
+            "description": "Null: no MCP per-order or per-withdrawal USD notional cap."
+          },
+          "maxNotionalMode": {
+            "type": "string",
+            "description": "Always unlimited for MCP orders and withdrawals. Backend account controls still apply."
+          },
+          "maxCallsPerMinute": {
+            "type": "integer",
+            "description": "Per-caller MCP call rate limit."
+          },
+          "maxDailyNotionalUsd": {
+            "type": "null",
+            "description": "Null: no MCP cumulative daily USD cap on orders or withdrawals."
+          },
+          "dailyNotionalUsed": {
+            "type": "number",
+            "description": "Compatibility field, always zero: MCP does not track a daily USD budget."
+          },
+          "mcpHostSeesApiSecret": {
+            "type": "boolean",
+            "description": "True when private tools accept X-MBX-APISECRET at this MCP host."
+          },
+          "allowLeverage": {
+            "type": "boolean",
+            "description": "Server-side leverage allowance."
+          },
+          "approvalTextRequired": {
+            "type": "string",
+            "description": "Exact approval friction text for live orders."
+          },
+          "withdrawApprovalTextRequired": {
+            "type": "string",
+            "description": "Exact approval friction text for live withdraws."
+          },
+          "approvalFrictionOnly": {
+            "type": "boolean",
+            "description": "True when humanApproved/approvalText are friction only."
+          },
+          "credentialScoping": {
+            "type": "string",
+            "description": "Wallet login optional. Trade-only key: no withdraw. Full-access key (trade+withdraw): withdraw allowed."
+          },
+          "walletLoginOptional": {
+            "type": "boolean",
+            "description": "True: agents can trade with a web-app API key without wallet logon."
+          },
+          "credentialMapping": {
+            "type": "string",
+            "description": "How to map a logon/register response, or a web-app API key, onto MCP client headers."
+          },
+          "withdrawAssetsOnly": {
+            "type": "string",
+            "description": "stablecoins-only"
+          },
+          "allowedSymbols": {
+            "type": "array",
+            "description": "Trading symbol allowlist. Empty=deny-all; *=all instruments; else explicit symbols.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "allowedWithdrawAssets": {
+            "type": "array",
+            "description": "Withdraw asset allowlist, independent of allowedSymbols. Empty=deny-all withdrawals; *=all stablecoins; else explicit assets (USDC, USDT, XUSDC).",
+            "items": {
+              "type": "string"
+            }
+          },
+          "depositAssets": {
+            "type": "array",
+            "description": "Supported deposit asset symbols (USDC, USDT, XUSDC).",
+            "items": {
+              "type": "string"
+            }
+          },
+          "withdrawAssets": {
+            "type": "array",
+            "description": "Supported withdraw asset symbols (stablecoins only: USDC, USDT, XUSDC).",
+            "items": {
+              "type": "string"
+            }
+          },
+          "credentialStatus": {
+            "type": "object",
+            "properties": {
+              "mode": {
+                "type": "string",
+                "description": "Credential mode."
+              },
+              "apiKeyHeader": {
+                "type": "string",
+                "description": "Inbound API key header name (X-MBX-APIKEY)."
+              },
+              "apiSecretHeader": {
+                "type": "string",
+                "description": "Inbound API secret header name (X-MBX-APISECRET)."
+              },
+              "apiKey": {
+                "type": "string",
+                "description": "Redacted per-request API key status."
+              },
+              "apiSecret": {
+                "type": "string",
+                "description": "Whether the per-request API secret is set."
+              },
+              "outboundAuthHeaders": {
+                "type": "string",
+                "description": "Headers sent to Quote.Trade private APIs."
+              },
+              "mcpHostSeesApiSecret": {
+                "type": "boolean",
+                "description": "True: this MCP host receives the raw API secret to compute the HMAC signature."
+              },
+              "trustWarning": {
+                "type": "string",
+                "description": "What possession of the API secret grants this MCP host."
+              },
+              "accountDefault": {
+                "type": "string",
+                "description": "Optional default account id."
+              }
+            },
+            "required": [
+              "mode",
+              "apiKeyHeader",
+              "apiSecretHeader",
+              "apiKey",
+              "apiSecret",
+              "outboundAuthHeaders",
+              "mcpHostSeesApiSecret",
+              "trustWarning"
+            ],
+            "additionalProperties": false
+          },
+          "tools": {
+            "type": "array",
+            "description": "Registered tool names.",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "adapter",
+          "version",
+          "releaseDate",
+          "ordersExposedThroughMcp",
+          "withdrawalsExposedThroughMcp",
+          "depositsExposedThroughMcp",
+          "liveTradingExecutable",
+          "liveWithdrawExecutable",
+          "tradingEnabled",
+          "allowedSymbols",
+          "allowedSymbolsMode",
+          "maxNotionalUsd",
+          "maxNotionalMode",
+          "approvalFrictionOnly",
+          "credentialStatus",
+          "tools"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "quote_trade_get_challenge",
+      "title": "Quote.Trade get wallet auth challenge",
+      "description": "Optional wallet login/register step 1 (not required for trading with an existing API key). POST /api/getChallenge with a wallet address (login). Returns challenge text and isNewUser. Step 2: sign the challenge with the wallet outside MCP. Step 3: quote_trade_logon. No API key required.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "login": {
+            "type": "string",
+            "description": "Wallet address used as login, e.g. 0x15b65a49faf9a4047e912d7de4a77fe24c7cf483."
+          }
+        },
+        "required": [
+          "login"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_logon",
+      "title": "Quote.Trade wallet logon / register",
+      "description": "Optional wallet login/register step 3 (not required if the agent already has an API key). Pass challenge + wallet signature from steps 1–2. isNewUser=true -> POST /api/registerUser; else POST /api/logon. On success, map body.requestToken/requestSecret to X-MBX-APIKEY / X-MBX-APISECRET; use body.id as account. For quote_trade_withdraw use body.walletRequestToken/walletRequestSecret as those headers instead. Wallet signing stays outside MCP.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "challenge": {
+            "type": "string",
+            "description": "Challenge text returned by quote_trade_get_challenge (Sign auth token: ...)."
+          },
+          "signature": {
+            "type": "string",
+            "description": "Wallet signature of the challenge text (0x-prefixed hex)."
+          },
+          "isNewUser": {
+            "type": "boolean",
+            "description": "From quote_trade_get_challenge. true -> registerUser; false -> logon. If omitted, logon is tried first then registerUser on failure."
+          }
+        },
+        "required": [
+          "challenge",
+          "signature"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          },
+          "credentialMapping": {
+            "type": "object",
+            "description": "Present on success only. Maps this response's requestToken/requestSecret (trading), walletRequestToken/walletRequestSecret (withdraw) and id to the MCP client headers and account field to use next."
+          },
+          "nextStep": {
+            "type": "string",
+            "description": "Present on success only. What to configure before calling private tools."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_get_deposit_address",
+      "title": "Quote.Trade get deposit address",
+      "description": "Deposit step 1. GET /api/getDepositAddress?symbol=ASSET and return chain + contract/address. Supported assets: USDC and USDT (mainnet), XUSDC (USDC on XDC). Step 2 is transferring funds to that address outside MCP (no backend call).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "description": "Deposit asset symbol: USDC or USDT (mainnet), or XUSDC (USDC on XDC network)."
+          }
+        },
+        "required": [
+          "symbol"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_status",
+      "title": "Quote.Trade status",
+      "description": "Call GET /api/status and return system status, server time, contracts URL, and feature flags.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_exchange_info",
+      "title": "Quote.Trade exchange info",
+      "description": "Call GET /api/exchangeInfo and return a paginated slice of trading symbols plus rate limits/server time. Upstream has no pagination, so this adapter filters/slices locally. Default limit=50, max=200. Prefer quote_trade_instruments for compact tradable-pair discovery.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Max symbols to return. Default 50, max 200."
+          },
+          "skip": {
+            "type": "integer",
+            "description": "Number of matching symbols to skip before returning. Default 0."
+          },
+          "symbols": {
+            "type": "string",
+            "description": "Optional comma-separated symbol filter, e.g. BTC,ETH,SOL. When set, pagination applies to the filtered list."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_instruments",
+      "title": "Quote.Trade instruments",
+      "description": "Trade step 1. GET /api/getInstrumentPairs — paginated tradable symbols/instruments. Default limit=50, max=200. Use skip to page. Pick a symbol from this response for ticker/depth/order calls.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Max instruments to return. Default 50, max 200."
+          },
+          "skip": {
+            "type": "integer",
+            "description": "Number of instruments to skip before returning. Default 0."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_ticker",
+      "title": "Quote.Trade ticker",
+      "description": "Trade step 2. GET /api/ticker?symbol=SYMBOL for a symbol from quote_trade_instruments. Returns last price, bid, ask, lastUpdateId.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "description": "Instrument symbol from quote_trade_instruments, such as BTC or ETH."
+          }
+        },
+        "required": [
+          "symbol"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_depth",
+      "title": "Quote.Trade order depth",
+      "description": "Trade step 3. GET /api/depth?symbol=SYMBOL&limit=N. Use depth quantity to choose a suitable limit price before placing an order.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "description": "Instrument symbol from quote_trade_instruments, such as BTC or ETH."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Optional maximum levels per side. Positive values are enforced by MCP; omitted/nonpositive uses upstream depth."
+          }
+        },
+        "required": [
+          "symbol"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_account",
+      "title": "Quote.Trade account summary",
+      "description": "Withdraw step 1 / anytime account check. GET /api/account with per-request X-MBX-APIKEY. Inspect available balances before withdraw. No live trading action.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_get_positions",
+      "title": "Quote.Trade current positions",
+      "description": "Anytime position check. GET /api/positions with per-request X-MBX-APIKEY. Reconcile current positions when starting or reconnecting, per the direct-discovery guide (quote_trade_api_discovery / rest.privateReads). No live trading action.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_get_orders",
+      "title": "Quote.Trade current/open orders",
+      "description": "Anytime order check. POST /api/getOrders with per-request X-MBX-APIKEY. Read-only: no live trading action. Requires read entitlement on API keys that carry one.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "description": "Optional instrument symbol filter, such as BTC. Omit for all symbols."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Optional maximum number of orders to return."
+          },
+          "startTime": {
+            "type": "integer",
+            "description": "Optional inclusive start of a time range, epoch milliseconds."
+          },
+          "endTime": {
+            "type": "integer",
+            "description": "Optional inclusive end of a time range, epoch milliseconds."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_get_order_status",
+      "title": "Quote.Trade single order status",
+      "description": "Anytime order check. POST /api/orderStatus with per-request X-MBX-APIKEY. Query the status of an order previously placed with quote_trade_place_order. Read-only: no live trading action.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "integer",
+            "description": "The order id returned by quote_trade_place_order."
+          }
+        },
+        "required": [
+          "orderId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_get_risk",
+      "title": "Quote.Trade account risk/margin summary",
+      "description": "Anytime risk check. POST /api/getRisk with per-request X-MBX-APIKEY. Margin/equity/unrealized-PnL summary for the authenticated account. Read-only: no live trading action.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_get_order_history",
+      "title": "Quote.Trade order history",
+      "description": "Anytime order check. POST /api/getOrderHistory with per-request X-MBX-APIKEY. Full order history, or one order's history with optional orderId. Requires a trade-scoped API key (same scope as quote_trade_place_order). Read-only: no live trading action.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "integer",
+            "description": "Optional order id to narrow to one order's history. Omit for the full order history."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_get_deposit_history",
+      "title": "Quote.Trade deposit history",
+      "description": "Anytime deposit check. POST /api/getDepositHistory with per-request X-MBX-APIKEY. Requires a trade-scoped API key (same scope as quote_trade_place_order). Read-only: no live trading action.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_get_withdraw_requests",
+      "title": "Quote.Trade withdraw request history",
+      "description": "Anytime withdrawal check. POST /api/getWithdrawRequests with per-request X-MBX-APIKEY. Inspect the status of withdrawals already submitted (including via quote_trade_withdraw). Requires a trade-scoped API key. Read-only: no live trading action, and this tool cannot cancel a withdrawal.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_get_user_wallets",
+      "title": "Quote.Trade known deposit wallet addresses",
+      "description": "Anytime wallet check. POST /api/getUserWallets with per-request X-MBX-APIKEY. On-chain addresses previously seen depositing to the authenticated account. Read-only: no live trading action.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_get_index_positions",
+      "title": "Quote.Trade index/basket positions",
+      "description": "Anytime position check. POST /api/getIndexPositions with per-request X-MBX-APIKEY. Distinct from quote_trade_get_positions: index/basket instrument positions rather than regular instrument positions. Optional assetType filter. Read-only: no live trading action.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "assetType": {
+            "type": "string",
+            "description": "Optional index/basket asset type filter. Omit for all."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_order_preview",
+      "title": "Quote.Trade order preview",
+      "description": "Optional before live trade. Normalize/validate a BUY/SELL order locally without sending it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "type": "integer",
+            "description": "Quote.Trade account/user id. Optional for preview (defaults to account init-param, QUOTE_TRADE_ACCOUNT, or 0). Required for live place_order."
+          },
+          "symbol": {
+            "type": "string",
+            "description": "Instrument symbol from quote_trade_instruments, such as BTC."
+          },
+          "side": {
+            "type": "string",
+            "description": "BUY or SELL."
+          },
+          "type": {
+            "type": "string",
+            "description": "LIMIT only in this adapter."
+          },
+          "price": {
+            "type": "number",
+            "description": "Limit price chosen after quote_trade_depth."
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Order quantity."
+          },
+          "paymentCurrency": {
+            "type": "string",
+            "description": "Payment currency such as USDT."
+          },
+          "disableLeverage": {
+            "type": "integer",
+            "description": "1 disables leverage; 0 enables leverage/shorting only if server allowLeverage is true."
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "Optional client timestamp in milliseconds."
+          }
+        },
+        "required": [
+          "symbol",
+          "side",
+          "price",
+          "quantity"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "willSend": {
+            "type": "boolean",
+            "description": "Whether this preview would send a live order."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Target Quote.Trade order endpoint."
+          },
+          "estimatedNotional": {
+            "type": "number",
+            "description": "Estimated notional in USD (orders: price×qty; withdraws: USD price×human quantity)."
+          },
+          "estimatedQuantity": {
+            "type": "number",
+            "description": "Withdraw human quantity only (quantity / 10^quantity_scale). Present on withdraw previews."
+          },
+          "estimatedNotionalUsd": {
+            "type": "number",
+            "description": "Withdraw USD notional. Present on withdraw previews when priced."
+          },
+          "priceUsd": {
+            "type": "number",
+            "description": "USD unit price used for withdraw notional."
+          },
+          "priceSource": {
+            "type": "string",
+            "description": "How priceUsd was obtained (stablecoin-peg|ticker|ticker-unavailable)."
+          },
+          "destination": {
+            "type": "string",
+            "description": "Withdraw previews only: always own-wallet-login-only (no toAddress accepted)."
+          },
+          "notionalWarning": {
+            "type": "string",
+            "description": "Withdraw previews only: present when a USD price could not be resolved."
+          },
+          "withdrawAssetAllowed": {
+            "type": "boolean",
+            "description": "Withdraw previews only: whether the asset passes allowedWithdrawAssets."
+          },
+          "symbolAllowed": {
+            "type": "boolean",
+            "description": "Whether the order symbol or withdrawal asset passes its own allowlist (empty=deny-all; *=all supported)."
+          },
+          "withinMaxNotional": {
+            "type": "boolean",
+            "description": "Always true for a valid preview: MCP imposes no USD notional cap. This does not establish balance, margin or authorization."
+          },
+          "tradingEnabled": {
+            "type": "boolean",
+            "description": "Server-side trading enablement."
+          },
+          "credentialsPresent": {
+            "type": "boolean",
+            "description": "Whether per-request trading credentials are present."
+          },
+          "approvalTextRequired": {
+            "type": "string",
+            "description": "Exact approval friction text."
+          },
+          "approvalFrictionOnly": {
+            "type": "boolean",
+            "description": "True when approval fields are friction only."
+          },
+          "safety": {
+            "type": "string",
+            "description": "Preview safety notes."
+          },
+          "requestBody": {
+            "type": "object",
+            "description": "Normalized order request body that would be posted.",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "willSend",
+          "endpoint",
+          "requestBody",
+          "estimatedNotional",
+          "symbolAllowed",
+          "withinMaxNotional",
+          "tradingEnabled",
+          "credentialsPresent",
+          "approvalFrictionOnly",
+          "safety"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "quote_trade_place_order",
+      "title": "Quote.Trade place live order",
+      "description": "Trade step 4. POST /api/order with a suitable price after instruments/ticker/depth. Requires tradingEnabled, allowedSymbols (* or explicit list; empty denies), and API credentials. No MCP USD notional cap applies. Sending X-MBX-APISECRET to this MCP host grants it full signing authority. humanApproved/approvalText are agent friction only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "type": "integer",
+            "description": "Quote.Trade account/user id. Optional for preview (defaults to account init-param, QUOTE_TRADE_ACCOUNT, or 0). Required for live place_order."
+          },
+          "symbol": {
+            "type": "string",
+            "description": "Instrument symbol from quote_trade_instruments, such as BTC."
+          },
+          "side": {
+            "type": "string",
+            "description": "BUY or SELL."
+          },
+          "type": {
+            "type": "string",
+            "description": "LIMIT only in this adapter."
+          },
+          "price": {
+            "type": "number",
+            "description": "Limit price chosen after quote_trade_depth."
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Order quantity."
+          },
+          "paymentCurrency": {
+            "type": "string",
+            "description": "Payment currency such as USDT."
+          },
+          "disableLeverage": {
+            "type": "integer",
+            "description": "1 disables leverage; 0 enables leverage/shorting only if server allowLeverage is true."
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "Optional client timestamp in milliseconds."
+          },
+          "humanApproved": {
+            "type": "boolean",
+            "description": "Agent-supplied confirmation friction (not a security control). Must be true; enableTrading remains authoritative."
+          },
+          "approvalText": {
+            "type": "string",
+            "description": "Agent-supplied confirmation friction (not a security control). Must exactly equal: APPROVE QUOTE.TRADE LIVE ORDER"
+          }
+        },
+        "required": [
+          "account",
+          "symbol",
+          "side",
+          "price",
+          "quantity",
+          "humanApproved",
+          "approvalText"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_cancel_order",
+      "title": "Quote.Trade cancel a single live order",
+      "description": "Cancel one order by orderId. POST /api/cancelOrder. Identifies exactly one order via the matching engine's single-order cancel path - NOT a mass-cancel. There is no quote_trade_cancel_all: the upstream mass-cancel action's scope for edge-case parameters could not be verified from this codebase alone and is intentionally not exposed through MCP. Requires tradingEnabled, allowedSymbols (same allowlist as quote_trade_place_order), and a trade-scoped API key. No notional check applies: a cancellation has none. humanApproved/approvalText are agent friction only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "type": "integer",
+            "description": "Quote.Trade account/user id. Optional (defaults to account init-param, QUOTE_TRADE_ACCOUNT, or 0)."
+          },
+          "symbol": {
+            "type": "string",
+            "description": "Instrument symbol the order was placed on, such as BTC."
+          },
+          "orderId": {
+            "type": "integer",
+            "description": "The order id returned by quote_trade_place_order."
+          },
+          "side": {
+            "type": "string",
+            "description": "Optional BUY or SELL, matching the original order. Passed through if given."
+          },
+          "humanApproved": {
+            "type": "boolean",
+            "description": "Agent-supplied confirmation friction (not a security control). Must be true; enableTrading remains authoritative."
+          },
+          "approvalText": {
+            "type": "string",
+            "description": "Agent-supplied confirmation friction (not a security control). Must exactly equal: APPROVE QUOTE.TRADE CANCEL ORDER"
+          }
+        },
+        "required": [
+          "symbol",
+          "orderId",
+          "humanApproved",
+          "approvalText"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "quote_trade_withdraw_preview",
+      "title": "Quote.Trade withdraw preview",
+      "description": "Optional before live withdraw. Stablecoins only: USDC, USDT, or XUSDC (not BTC/ETH/other). Own login wallet only (no toAddress). estimatedNotional is USD at $1 peg. Trade-only API keys and the logon/register trade pair cannot withdraw — use the logon/register walletRequestToken/walletRequestSecret as X-MBX-APIKEY/X-MBX-APISECRET, or a created API key with the WITHDRAW permission.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "type": "integer",
+            "description": "Quote.Trade account/user id. Optional for preview (defaults to account init-param, QUOTE_TRADE_ACCOUNT, or 0). Required for live withdraw."
+          },
+          "symbol": {
+            "type": "string",
+            "description": "Stablecoin to withdraw: USDC, USDT, or XUSDC only (not BTC/ETH/other)."
+          },
+          "quantity": {
+            "type": "string",
+            "description": "Scaled integer quantity as string (API format). Example: \"20000000\" with quantity_scale=6 means 20 USDC."
+          },
+          "quantity_scale": {
+            "type": "integer",
+            "description": "Decimal scale for quantity; must equal the instrument's quantity scale. Example: 6 for USDC."
+          }
+        },
+        "required": [
+          "symbol",
+          "quantity",
+          "quantity_scale"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "willSend": {
+            "type": "boolean",
+            "description": "Whether this preview would send a live order."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Target Quote.Trade order endpoint."
+          },
+          "estimatedNotional": {
+            "type": "number",
+            "description": "Estimated notional in USD (orders: price×qty; withdraws: USD price×human quantity)."
+          },
+          "estimatedQuantity": {
+            "type": "number",
+            "description": "Withdraw human quantity only (quantity / 10^quantity_scale). Present on withdraw previews."
+          },
+          "estimatedNotionalUsd": {
+            "type": "number",
+            "description": "Withdraw USD notional. Present on withdraw previews when priced."
+          },
+          "priceUsd": {
+            "type": "number",
+            "description": "USD unit price used for withdraw notional."
+          },
+          "priceSource": {
+            "type": "string",
+            "description": "How priceUsd was obtained (stablecoin-peg|ticker|ticker-unavailable)."
+          },
+          "destination": {
+            "type": "string",
+            "description": "Withdraw previews only: always own-wallet-login-only (no toAddress accepted)."
+          },
+          "notionalWarning": {
+            "type": "string",
+            "description": "Withdraw previews only: present when a USD price could not be resolved."
+          },
+          "withdrawAssetAllowed": {
+            "type": "boolean",
+            "description": "Withdraw previews only: whether the asset passes allowedWithdrawAssets."
+          },
+          "symbolAllowed": {
+            "type": "boolean",
+            "description": "Whether the order symbol or withdrawal asset passes its own allowlist (empty=deny-all; *=all supported)."
+          },
+          "withinMaxNotional": {
+            "type": "boolean",
+            "description": "Always true for a valid preview: MCP imposes no USD notional cap. This does not establish balance, margin or authorization."
+          },
+          "tradingEnabled": {
+            "type": "boolean",
+            "description": "Server-side trading enablement."
+          },
+          "credentialsPresent": {
+            "type": "boolean",
+            "description": "Whether per-request trading credentials are present."
+          },
+          "approvalTextRequired": {
+            "type": "string",
+            "description": "Exact approval friction text."
+          },
+          "approvalFrictionOnly": {
+            "type": "boolean",
+            "description": "True when approval fields are friction only."
+          },
+          "safety": {
+            "type": "string",
+            "description": "Preview safety notes."
+          },
+          "requestBody": {
+            "type": "object",
+            "description": "Normalized order request body that would be posted.",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "willSend",
+          "endpoint",
+          "requestBody",
+          "estimatedNotional",
+          "symbolAllowed",
+          "withinMaxNotional",
+          "tradingEnabled",
+          "credentialsPresent",
+          "approvalFrictionOnly",
+          "safety"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "quote_trade_withdraw",
+      "title": "Quote.Trade live withdraw",
+      "description": "Withdraw step 3. POST /api/sendWithdrawWithVTokenRequest for stablecoins only (USDC|USDT|XUSDC) to the user's own login wallet (no toAddress). Not available for BTC/ETH/other assets. Requires the logon/register walletRequestToken/walletRequestSecret as X-MBX-APIKEY/X-MBX-APISECRET, or a created API key with the WITHDRAW permission (trade-only keys and the logon/register trade pair are rejected by Quote.Trade), tradingEnabled, and allowedWithdrawAssets (independent of the trading allowedSymbols allowlist). No MCP USD notional cap applies. humanApproved/approvalText are agent friction only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "type": "integer",
+            "description": "Quote.Trade account/user id. Optional for preview (defaults to account init-param, QUOTE_TRADE_ACCOUNT, or 0). Required for live withdraw."
+          },
+          "symbol": {
+            "type": "string",
+            "description": "Stablecoin to withdraw: USDC, USDT, or XUSDC only (not BTC/ETH/other)."
+          },
+          "quantity": {
+            "type": "string",
+            "description": "Scaled integer quantity as string (API format). Example: \"20000000\" with quantity_scale=6 means 20 USDC."
+          },
+          "quantity_scale": {
+            "type": "integer",
+            "description": "Decimal scale for quantity; must equal the instrument's quantity scale. Example: 6 for USDC."
+          },
+          "humanApproved": {
+            "type": "boolean",
+            "description": "Agent-supplied confirmation friction (not a security control). Must be true; enableTrading remains authoritative."
+          },
+          "approvalText": {
+            "type": "string",
+            "description": "Agent-supplied confirmation friction (not a security control). Must exactly equal: APPROVE QUOTE.TRADE LIVE WITHDRAW"
+          }
+        },
+        "required": [
+          "account",
+          "symbol",
+          "quantity",
+          "quantity_scale",
+          "humanApproved",
+          "approvalText"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "HTTP method used against Quote.Trade."
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Quote.Trade API endpoint path."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw JSON response body."
+          },
+          "body": {
+            "description": "Parsed JSON response body when valid JSON; otherwise the raw text."
+          }
+        },
+        "required": [
+          "method",
+          "endpoint",
+          "status",
+          "body",
+          "raw"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": true
+      }
+    }
+  ],
+  "version": "1.5.14"
+}
